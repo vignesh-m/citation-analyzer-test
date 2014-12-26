@@ -39,6 +39,7 @@ public class EntryList implements Iterable< Entry >{
         boolean mark=false;
         list.add(e);
         for(String name:e.author){
+            name=name.replace(".", "");
             if(authorlist.contains(name)) {
                 mark=true;
             }

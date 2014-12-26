@@ -66,6 +66,13 @@ public class parser {
             String str="http://scholar.google.com/scholar?start="+start+"&q=author:"+name+"&hl=en&num="+numperpage;
             return str;
         }
+        if(option==2){
+            //publication search
+            name=name.replace(" ","%20");
+            String str="http://scholar.google.com/scholar?start="+start+"&q=publication:"+name+"&hl=en&num="+numperpage;
+
+            return str;
+        }
         return null;
     }
 
@@ -73,7 +80,7 @@ public class parser {
         Elements entries;
         EntryList entryList=new EntryList();
             int st;
-            for(st=0;st<=num-10;st+=10){
+            for(st=0;st<num-10;st+=10){
                 entries=(Jsoup.parse(getHTML(searchString(option,name,st,10)))).getElementsByClass("gs_r");
                 for(Element el:entries){
                     Entry entry=new Entry(el);
@@ -88,8 +95,9 @@ public class parser {
             return entryList;
     }
     public static void main(String[] args) throws Exception{
-        EntryList list=parsePage(1,"einstein",10);
+        EntryList list=parsePage(2,"nature",10);
         System.out.println(list.size());
         for(Entry i:list) System.out.println(i);
+        System.out.println(predata.containsKey(searchString(2,"nature",0,10)));
     }
 }

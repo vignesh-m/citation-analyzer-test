@@ -305,8 +305,9 @@ public class MainWindow extends JFrame{
     }
     public class SearchDialog extends JDialog{
         JTextField name,number;
+        int mode;
         public void searchBtn(MainWindow parent){
-            parent.search(1,name.getText(),number.getText());
+            parent.search(mode,name.getText(),number.getText());
             setVisible(false);
             parent.searchdialogopen=false;
             dispose();
@@ -318,16 +319,35 @@ public class MainWindow extends JFrame{
             dispose();
         }
         public SearchDialog(final MainWindow parent){
+            mode=1;
             if (parent != null) {
                 Dimension parentSize = parent.getSize(); 
                 Point p = parent.getLocation(); 
                 setLocation(p.x + parentSize.width / 4, p.y + parentSize.height / 4);
               }
-            JPanel messagePane = new JPanel(new MigLayout("","[right]rel[grow,fill]","[][][]"));
-            messagePane.add(new JLabel("Author Name:"),"");
+            JPanel messagePane = new JPanel(new MigLayout("","[right]rel[grow,fill][grow,fill]","[][][][]"));
+            messagePane.add(new JLabel("Name:"),"");
             messagePane.add((name=new JTextField("Enter name:")),"wrap");
             messagePane.add(new JLabel("Number of Results:"),"");
             messagePane.add((number=new JTextField("10")),"wrap");
+            JRadioButton authorOpt=new JRadioButton("Author Search");
+            JRadioButton publicOpt=new JRadioButton("Publication Search");
+            ButtonGroup optGroup=new ButtonGroup();
+            authorOpt.setSelected(true);
+            optGroup.add(authorOpt);
+            optGroup.add(publicOpt);
+            messagePane.add(authorOpt,"spany");
+            messagePane.add(publicOpt,"spany");
+            authorOpt.addActionListener(new ActionListener(){
+                public void actionPerformed(ActionEvent e) {
+                    mode=1;
+                }
+            });
+            publicOpt.addActionListener(new ActionListener(){
+                public void actionPerformed(ActionEvent e) {
+                    mode=2;
+                }
+            });
             getContentPane().add(messagePane);
             JPanel buttonPane = new JPanel();
             JButton button = new JButton("OK"); 
@@ -380,6 +400,7 @@ public class MainWindow extends JFrame{
             @Override
             public void run() {
                 MainWindow win=new MainWindow();
+                win.setTitle("Citation Analyzer");
                 win.setVisible(true);
             }
         });

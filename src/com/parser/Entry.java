@@ -173,6 +173,7 @@ public class Entry {
         if(this.abstText!=null)str+="Abstract : "+this.abstText+"\n";
         //if(this.citations!=null)str+=this.citations.text+"\n";
         if(this.citationcount>=0) str+="Number of Citations : "+this.citationcount+"\n"; 
+        if(this.citations!=null) str+="Citations link : "+this.citations;
         return str;
     }
     public String toString_basic(){
@@ -189,6 +190,7 @@ public class Entry {
         }
         if(this.year>0)str+="Year of Publication : "+this.year+"\n";
         if(this.citationcount>=0) str+="Number of Citations : "+this.citationcount+"\n"; 
+        
         return str;
     }
 }
