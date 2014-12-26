@@ -28,6 +28,8 @@ public class MainWindow extends JFrame{
     JCheckBox sortyear;
     JCheckBox sortcit;
     boolean searchdialogopen;
+    boolean authordialogopen;
+    boolean datedialogopen;
     public MainWindow(){
         searchdialogopen=false;
         MigLayout layout = new MigLayout("fillx", "[][grow,fill][]", "[]rel[][]rel[][][][][]unrel[][][][]");
@@ -113,33 +115,60 @@ public class MainWindow extends JFrame{
         setDefaultCloseOperation(EXIT_ON_CLOSE);    
     }
     public void getHIndex(){
-        new SimpleDialog(this,"H-Index","H Index from current results is" +currentList.getHIndex());
+        if(currentList==null){
+            new SimpleDialog(this,"Error !","Try doing a search !");
+            return ;
+        }
+        new SimpleDialog(this,"H-Index","H Index from current results is " +currentList.getHIndex());
     }
     public void getIIndex(){
-        new SimpleDialog(this,"H-Index","H Index from current results is" +currentList.getIIndex());
+        if(currentList==null){
+            new SimpleDialog(this,"Error !","Try doing a search !");
+            return ;
+        }
+        new SimpleDialog(this,"I-Index","I Index from current results is " +currentList.getIIndex());
     }
     public void sortYr(){
+        if(currentList==null){
+            new SimpleDialog(this,"Error !","Try doing a search !");
+            return ;
+        }
         currentList.sortByYear(!sortyear.isSelected());
         updateText();
     }
     public void sortCit(){
+        if(currentList==null){
+            new SimpleDialog(this,"Error !","Try doing a search !");
+            return ;
+        }
         currentList.sortByCitations(!sortcit.isSelected());
         updateText();
     }
     public void searchBtnAction(){
-        //if(!searchdialogopen){
-        //    searchdialogopen=true;
+        if(!searchdialogopen){
+            searchdialogopen=true;
             this.new SearchDialog(this);
-        //}
-        
+        }
     }
     public void authorChangeBtnAction(){
-        AuthorSelect x=this.new AuthorSelect(this);
-        //this.currentList=x.list;
-        //updateText();
+        if(currentList==null){
+            new SimpleDialog(this,"Error !","Try doing a search !");
+            return ;
+        }
+        if(!authordialogopen){
+            authordialogopen=true;
+            this.new AuthorSelect(this);
+        }
     }
     public void dateSetBtnAction(){
-        this.new DateSet(this);
+        if(currentList==null){
+            new SimpleDialog(this,"Error !","Try doing a search !");
+            return ;
+        }
+        if(!datedialogopen){
+            datedialogopen=true;
+            this.new DateSet(this);
+        }
     }
     public void search(int mode,String name,String number){
         int num=10;
@@ -152,29 +181,32 @@ public class MainWindow extends JFrame{
         }
         try{
             currentList=parser.parsePage(mode, name, num);
-            System.out.println("got "+currentList.size()+" elements from "+parser.searchString(mode, name, 0, num));
+            //System.out.println("got "+currentList.size()+" elements from "+parser.searchString(mode, name, 0, num));
         }catch (java.net.UnknownHostException e){
             new SimpleDialog(this,"Error !","Check your Internet Connection - Unable to find host");
         }catch (Exception e){
             System.out.println(e);
             new SimpleDialog(this,"Error !","Error !");
         }
-        System.out.println("updating");
+        //System.out.println("updating");
         updateText();
     }
     public void updateText(){
-        if(currentList==null) {
-            return;
-        } 
+        if(currentList==null){
+            new SimpleDialog(this,"Error !","Try doing a search !");
+            return ;
+        }
         mainText.setText("");
-        System.out.println("printing "+currentList.size()+" elements");
+        //System.out.println("printing "+currentList.size()+" elements");
         for(Entry e:currentList){
             if(moreinfo.isSelected()) mainText.append(e.toString()+"\n");
             else mainText.append(e.toString_basic()+"\n");
         }
     }
     public class DateSet extends JDialog{
+        
         public void cancelBtn(){
+            parent.datedialogopen=false;
             setVisible(false);
             dispose();
         }
@@ -191,6 +223,7 @@ public class MainWindow extends JFrame{
                 parent.new SimpleDialog(parent,"Error !","Enter proper number");
             }
             setVisible(false);
+            parent.datedialogopen=false;
             dispose();
         }
         public DateSet(MainWindow parent){
@@ -238,6 +271,7 @@ public class MainWindow extends JFrame{
                 if(!cb.isSelected()) list.removeAuthor(cb.getText());
             }
             p.updateText();
+            p.authordialogopen=false;
             setVisible(false);
             dispose();
         }
@@ -280,6 +314,7 @@ public class MainWindow extends JFrame{
         public void cancelBtn(MainWindow parent){
             //parent.search(1,name.getText(),number.getText());
             setVisible(false);
+            parent.searchdialogopen=false;
             dispose();
         }
         public SearchDialog(final MainWindow parent){

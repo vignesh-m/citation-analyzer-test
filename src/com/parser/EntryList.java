@@ -168,8 +168,10 @@ public class EntryList implements Iterable< Entry >{
         
     }
     public int getHIndex(){
-        int countarr[] =new int[list.size()+1];
-        for(Entry e:this.list) countarr[Math.min(e.year,list.size())]++;
+        int countarr[] =new int[this.size()+1];
+        for(Entry e:this) {
+            countarr[Math.min(e.year,this.size())]++;
+        }
         int sum = 0;
         for (int i = countarr.length - 1; i >= 0; i--)
         {
