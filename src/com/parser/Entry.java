@@ -54,18 +54,24 @@ public class Entry {
             return str;
         }
     }
-    class Link{
+    public class Link{
         public String url;
         public String text;
         public Link(Element a){
             url=a.attr("href");
             text=a.ownText();
         }
+        public Link(){
+            ;
+        }
         public String toString(){
             String str="";
             str+="URL : "+url+ " , "+text;
             return str;
         }
+    }
+    public Entry(String title){
+        this.title=title;
     }
     public Entry(Element l){
         this.entryData=l;
@@ -191,6 +197,16 @@ public class Entry {
         if(this.year>0)str+="Year of Publication : "+this.year+"\n";
         if(this.citationcount>=0) str+="Number of Citations : "+this.citationcount+"\n"; 
         
+        return str;
+    }
+    public String authornames(){
+        String str="";
+        if(this.author.size()==1) str+=this.author.get(0)+"\n";
+        else
+            {
+                for(int i=0;i<this.author.size();i++)
+                str+=this.author.get(i)+((i==this.author.size()-1)?"":" , ");
+            }
         return str;
     }
 }

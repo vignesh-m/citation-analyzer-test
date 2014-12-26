@@ -8,6 +8,7 @@ package com.ui;
 
 import com.parser.*;
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Point;
@@ -22,32 +23,33 @@ import net.miginfocom.swing.*;
  * @author vigneshm
  */
 public class MainWindow extends JFrame{
-    JTextArea mainText;
+    JList mainText;
+    Vector<String> listData;
     EntryList currentList;
-    JCheckBox moreinfo;
     JCheckBox sortyear;
     JCheckBox sortcit;
+    JScrollPane textScroll;
     boolean searchdialogopen;
     boolean authordialogopen;
     boolean datedialogopen;
+    public MainWindow(EntryList elist){
+        this();
+        this.currentList=elist;
+        updateText();
+    }
     public MainWindow(){
         searchdialogopen=false;
         MigLayout layout = new MigLayout("fillx", "[][grow,fill][]", "[]rel[][]rel[][][][][]unrel[][][][]");
         JPanel panel = new JPanel(layout);
-        mainText=new JTextArea("text");
-        mainText.setLineWrap(true);
-        JScrollPane textScroll = new JScrollPane(mainText,    JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+        listData=new Vector<>();
+        mainText=new JList();
+        textScroll = new JScrollPane(mainText,    JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
         JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        mainText.setCellRenderer(new MyCellRenderer(textScroll.getWidth()));
+        mainText.setListData(listData);
         panel.add(textScroll,"h 100% , spany ,grow ,cell 1 0");
         JButton searchBtn=new JButton("Search");
         panel.add(searchBtn,"cell 0 3 , aligny top");
-        moreinfo=new JCheckBox("More Info");
-        moreinfo.addActionListener(new ActionListener(){
-            public void actionPerformed(ActionEvent e) {
-                updateText();
-            }
-        });
-        panel.add(moreinfo,"cell 0 7 ,aligny top ");
         JButton sortdateBtn=new JButton("Sort by date");
         sortdateBtn.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e) {
@@ -108,6 +110,13 @@ public class MainWindow extends JFrame{
         iindexBtn.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e){
                 getIIndex();
+            }
+        });
+        JButton openEntryBtn=new JButton("Open entry");
+        panel.add(openEntryBtn,"cell 0 7,aligny top");
+        openEntryBtn.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e){
+                openEntry();
             }
         });
         setContentPane(panel);
@@ -196,12 +205,32 @@ public class MainWindow extends JFrame{
             new SimpleDialog(this,"Error !","Try doing a search !");
             return ;
         }
-        mainText.setText("");
-        //System.out.println("printing "+currentList.size()+" elements");
+        System.out.println("printing "+currentList.size()+" elements");
+        listData.clear();
         for(Entry e:currentList){
-            if(moreinfo.isSelected()) mainText.append(e.toString()+"\n");
-            else mainText.append(e.toString_basic()+"\n");
+            listData.add(e.title);
         }
+        mainText.setCellRenderer(new MyCellRenderer((int)(textScroll.getWidth()*0.7)));
+        mainText.setListData(listData);
+        textScroll.revalidate();
+        textScroll.repaint();
+    }
+    public void openEntry(){
+        int index=mainText.getSelectedIndex();
+        if(index<0 || index>=listData.size()) return;
+        String selTitle=listData.elementAt(index);
+        Entry selEntry=null;
+        for(Entry e:currentList){
+            if(e.title.equals(selTitle)){
+                selEntry=e;
+                break;
+            }
+        }
+        if(selEntry==null) return;
+        EntryDisplay display=new EntryDisplay(selEntry,this);
+        display.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        display.pack(); 
+        display.setVisible(true);
     }
     public class DateSet extends JDialog{
         
@@ -395,6 +424,26 @@ public class MainWindow extends JFrame{
             dispose(); 
         }
     }
+    class MyCellRenderer extends DefaultListCellRenderer {
+   public static final String HTML_1 = "<html><body style='width: ";
+   public static final String HTML_2 = "px'>";
+   public static final String HTML_3 = "</html>";
+   private int width;
+
+   public MyCellRenderer(int width) {
+      this.width = width;
+   }
+
+   @Override
+   public Component getListCellRendererComponent(JList list, Object value,
+         int index, boolean isSelected, boolean cellHasFocus) {
+      String text = HTML_1 + String.valueOf(width) + HTML_2 + value.toString()
+            + HTML_3;
+      return super.getListCellRendererComponent(list, text, index, isSelected,
+            cellHasFocus);
+   }
+
+}
     public static void main(String[] args){
         EventQueue.invokeLater(new Runnable() {
             @Override

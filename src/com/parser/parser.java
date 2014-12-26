@@ -45,6 +45,10 @@ public class parser {
     }
     static String getHTML(String url) throws Exception {
         getPreData();
+        if(predata.containsKey(url.trim())) {
+            System.out.println("getting from local data "+url.trim());
+            return  predata.get(url.trim());
+        }
         URLConnection connection = new URL(url).openConnection();
         connection.setRequestProperty("User-Agent", "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)");
         connection.connect();
@@ -56,7 +60,7 @@ public class parser {
         while ((line = r.readLine()) != null) {
             sb.append(line);
         }
-        if(predata.containsKey(url.trim())) return  predata.get(url.trim());
+        
         return sb.toString();
     }
     public static String searchString(int option,String name,int start,int numperpage){
@@ -72,6 +76,11 @@ public class parser {
             String str="http://scholar.google.com/scholar?start="+start+"&q=publication:"+name+"&hl=en&num="+numperpage;
 
             return str;
+        }
+        if(option==3){
+            //citation list search
+            String str="http://scholar.google.com"+name+"&start="+start+"&num="+numperpage;
+            System.out.println(str);
         }
         return null;
     }
